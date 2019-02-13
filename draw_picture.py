@@ -14,6 +14,6 @@ plt.plot(stock2['date'],stock2['close'])
 plt.xticks(rotation=30)
 plt.xlabel('day')
 plt.ylabel('close price')
-plt.title('stock figure for 000002')
+plt.title('stock-figure for two stocks')
 
 plt.show()

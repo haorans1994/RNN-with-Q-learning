@@ -1,15 +1,16 @@
-
+import torch
 from torch import nn
+from torch.autograd import Variable
 
 
-INPUT_SIZE = 28
+LR = 0.02
+TIME_STEP = 10
 
 
 
-
-class RNN(nn.Module):
-    def __init__(self):
-        super(RNN, self).__init__()
+class RNN_stock(nn.Module):
+    def __init__(self, INPUT_SIZE):
+        super(RNN_stock, self).__init__()
 
         self.rnn = nn.LSTM(
             input_size = INPUT_SIZE,
@@ -17,12 +18,15 @@ class RNN(nn.Module):
             num_layers = 1,
             batch_first = True,
         )
-        self.out = nn.Linear(64,10)
+        self.out = nn.Linear(64,1)
 
-    def forward(self,x):
-        r_out,(h_n,h_c) = self.rnn(x,None)
-        out = self.out(r_out[:,-1,:])
-        return out
+    def forward(self,x,h_state):
 
-rnn = RNN()
-print(rnn)
+        r_out, h_state = self.rnn(x,h_state)
+        outs = []
+        for time_step in range(r_out.size(1)):
+            outs.append(self.out[:,time_step,:])
+
+        return torch.stack(outs,dim = 1), h_state
+
+
