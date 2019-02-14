@@ -22,7 +22,8 @@ def generate_data(data):
 new_data,original_data = generate_data(NAME)
 Keys = new_data.keys()
 train_data = new_data.values
-EPOC = len(original_data)
+train_data = train_data[0:510]
+EPOC = len(train_data)
 INPUT_SIZE = len(Keys)
 rnn = RNN.RNN_stock(INPUT_SIZE)
 # print(rnn)
@@ -33,11 +34,9 @@ loss_function = RNN.nn.MSELoss()
 
 
 h_state = None
-image_x = []
-image_predict = []
-image_real = []
-Train_Number = 500
+
 for step in range(EPOC-RNN.TIME_STEP-1):
+    print(step)
     start = step
     end = step + RNN.TIME_STEP
     # steps = np.linspace(start,end,RNN.TIME_STEP,dtype=int)
@@ -54,16 +53,7 @@ for step in range(EPOC-RNN.TIME_STEP-1):
     target = target.float()
     target = autograd.Variable(target)
 
-
     prediction, h_state = rnn(x,h_state)
-
-    print(step,original_data['close'][end])
-    if step > Train_Number:
-        image_x.append((step-Train_Number))
-        image_predict.append(prediction.data.numpy()[0][0][-1])
-        image_real.append(original_data['close'][end])
-
-
 
 
     # prediction = np.array(prediction,dtype=float)
@@ -75,23 +65,4 @@ for step in range(EPOC-RNN.TIME_STEP-1):
     loss.backward(retain_graph=True)
     optimizer.step()
 
-
-
-
-plt.plot(image_x,image_predict,color='green',label = 'prediction price')
-plt.plot(image_x,image_real,color='red',label = 'real price')
-
-plt.xlabel('step')
-plt.legend()
-
-plt.title('compared of real price and predicitons')
-
-plt.show()
-
-
-
-
-    # print(input)
-
-
-
+torch.save(rnn, 'Stock1_rnn.pkl')

@@ -3,7 +3,7 @@ from torch import nn
 from torch.autograd import Variable
 
 
-LR = 0.02
+LR = 0.04
 TIME_STEP = 10
 
 
@@ -15,7 +15,7 @@ class RNN_stock(nn.Module):
         self.rnn = nn.LSTM(
             input_size=INPUT_SIZE,
             hidden_size=64,
-            num_layers=1,
+            num_layers=3,
             batch_first=True,
         )
         self.out = nn.Linear(64,1)
