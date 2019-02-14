@@ -3,6 +3,9 @@ import matplotlib
 import matplotlib.pyplot as plt
 import RNN
 import numpy as np
+import torch
+from torch import autograd
+from torch.autograd import Variable
 
 NAME= '000001.csv'
 
@@ -17,11 +20,12 @@ def generate_data(data):
     return relative_data, stock
 
 new_data,original_data = generate_data(NAME)
-keys = new_data.keys()
+Keys = new_data.keys()
 train_data = new_data.values
 EPOC = len(original_data)
-State_number = len(keys)
+State_number = len(Keys)
 rnn = RNN.RNN_stock(State_number)
+# print(rnn)
 
 optimizer = RNN.torch.optim.Adam(rnn.parameters(),lr=RNN.LR)
 loss_function = RNN.nn.MSELoss()
@@ -29,20 +33,34 @@ loss_function = RNN.nn.MSELoss()
 
 
 h_state = None
-for step in range(EPOC-1):
-    # start = step
-    # end = step + RNN.TIME_STEP
+for step in range(EPOC-RNN.TIME_STEP):
+    start = step
+    end = step + RNN.TIME_STEP
     # steps = np.linspace(start,end,RNN.TIME_STEP,dtype=int)
-    input = train_data[step]
-    target = original_data['close'][step+1]
+    x = train_data[start:end]
+    x = x.reshape(1,RNN.TIME_STEP,13)
+    x = torch.from_numpy(x)
+    x = x.float()
+    x = autograd.Variable(x)
 
-    # prediction, h_state = rnn(input)
-    # h_state = RNN.Variable(h_state.data)
-    #
-    # loss = loss_function(prediction,target)
-    # optimizer.zero_grad()
-    # loss.backward()
-    # optimizer.step()
+    target = original_data['close'][start:end]
+    target = target.values
+    target = target.reshape(1,RNN.TIME_STEP,1)
+    target = torch.from_numpy(target)
+    target = target.float()
+    target = autograd.Variable(target)
+
+    prediction, h_state = rnn(x,h_state)
+
+
+    # prediction = np.array(prediction,dtype=float)
+    # prediciton = torch.from_numpy(prediction)
+    # prediction = autograd.Variable(prediction)
+
+    loss = loss_function(prediction,target)
+    optimizer.zero_grad()
+    loss.backward(retain_graph=True)
+    optimizer.step()
 
 
 
