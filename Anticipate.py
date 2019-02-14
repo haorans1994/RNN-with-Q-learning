@@ -33,7 +33,10 @@ loss_function = RNN.nn.MSELoss()
 
 
 h_state = None
-for step in range(EPOC-RNN.TIME_STEP):
+image_x = []
+image_y = []
+for step in range(EPOC-RNN.TIME_STEP-1):
+    print(step)
     start = step
     end = step + RNN.TIME_STEP
     # steps = np.linspace(start,end,RNN.TIME_STEP,dtype=int)
@@ -43,7 +46,7 @@ for step in range(EPOC-RNN.TIME_STEP):
     x = x.float()
     x = autograd.Variable(x)
 
-    target = original_data['close'][start:end]
+    target = original_data['close'][start+1:end+1]
     target = target.values
     target = target.reshape(1,RNN.TIME_STEP,1)
     target = torch.from_numpy(target)
@@ -61,6 +64,15 @@ for step in range(EPOC-RNN.TIME_STEP):
     optimizer.zero_grad()
     loss.backward(retain_graph=True)
     optimizer.step()
+    image_x.append(step)
+    image_y.append(loss.data.numpy()[0])
+
+plt.plot(image_x,image_y)
+plt.xlabel('step')
+plt.ylabel('loss value')
+plt.title('training loss value')
+
+plt.show()
 
 
 
