@@ -61,7 +61,7 @@ for step in range(EPOC-RNN.TIME_STEP-1):
     if step > Train_Number:
         image_x.append((step-Train_Number))
         image_predict.append(prediction.data.numpy()[0][0][-1])
-        image_real.append(original_data['close'][end])
+        image_real.append(target.data.numpy()[0][0][-1])
 
 
 
