@@ -15,7 +15,7 @@ class RNN_stock(nn.Module):
         self.rnn = nn.LSTM(
             input_size=INPUT_SIZE,
             hidden_size=64,
-            num_layers=3,
+            num_layers=1,
             batch_first=True,
         )
         self.out = nn.Linear(64,1)
