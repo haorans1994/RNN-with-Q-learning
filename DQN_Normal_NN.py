@@ -125,11 +125,8 @@ for i_episode in range(2001):
 
         if dqn.memory_counter > MEMORY_CAPACITY:
             dqn.learn()
-            if done:
-            	print ('Ep: ', i_episode,
-                      '| Ep_r: ', round(ep_r, 2))
-        if done:
-        	break
+            if done:print ('Ep: ', i_episode,'| Ep_r: ', round(ep_r, 2))
+        if done:break
         s = s_
 
 
