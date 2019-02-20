@@ -42,6 +42,7 @@ for step in range(EPOC-RNN.TIME_STEP-1):
     end = step + RNN.TIME_STEP
     # steps = np.linspace(start,end,RNN.TIME_STEP,dtype=int)
     x = train_data[start:end]
+    # print(type(x))
     x = x.reshape(1,RNN.TIME_STEP,13)
     x = torch.from_numpy(x)
     x = x.float()

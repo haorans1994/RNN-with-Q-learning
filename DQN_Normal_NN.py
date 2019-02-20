@@ -36,6 +36,7 @@ class Net(nn.Module):
         x = self.fc1(x)
         x = F.relu(x)
         actions_value=self.out(x)
+        # print(actions_value)
         return actions_value
 
 
@@ -57,7 +58,7 @@ class DQN(object):
         if np.random.uniform() < EPSILON:
             actions_value = self.eval_net.forward(x)
             action = torch.max(actions_value,1)[1].data.numpy()
-
+            # print(action)
             action = action[0] if ENV_A_SHAPE == 0 else action.reshape(ENV_A_SHAPE)
         else:
             action = np.random.randint(0,ALL_ACTIONS)
@@ -80,6 +81,7 @@ class DQN(object):
         sample_index = np.random.choice(MEMORY_CAPACITY,BATCH_SIZE)
 
         b_memory = self.memory[sample_index, :]
+        # print(b_memory[:, :OBSERVE_STATES])
 
         b_s = Variable(torch.FloatTensor(b_memory[:,:OBSERVE_STATES]))
         # print(len(b_s))
@@ -99,17 +101,18 @@ class DQN(object):
 
 dqn = DQN()
 
-print('\nCollecting experience...')
-for i_episode in range(2001):
-    s = env.reset() ##Getstate
+for i_episode in range(1000):
+    s = env.reset()
     # print(s)
-
     ep_r=0
+
     while True:
         env.render()
 
 
         a = dqn.choose_action(s)
+        # print(a)
+
         s_, r, done, info = env.step(a)
 
         x, x_dot, theta, theta_dot = s_
@@ -125,10 +128,9 @@ for i_episode in range(2001):
 
         if dqn.memory_counter > MEMORY_CAPACITY:
             dqn.learn()
-            if done:print ('Ep: ', i_episode,'| Ep_r: ', round(ep_r, 2))
+            if done:print('done')
         if done:break
         s = s_
-
 
 
 
