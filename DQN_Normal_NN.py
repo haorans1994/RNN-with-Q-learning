@@ -84,7 +84,7 @@ class DQN(object):
         # print(b_memory[:, :OBSERVE_STATES])
 
         b_s = Variable(torch.FloatTensor(b_memory[:,:OBSERVE_STATES]))
-        # print(len(b_s))
+        # print(b_s)
         # exit()
         b_a = Variable(torch.LongTensor(b_memory[:, OBSERVE_STATES:OBSERVE_STATES+1].astype(int)))
         b_r = Variable(torch.FloatTensor(b_memory[:,OBSERVE_STATES+1:OBSERVE_STATES+2]))
@@ -100,11 +100,12 @@ class DQN(object):
         self.optimizer.step()
 
 dqn = DQN()
-
-for i_episode in range(1000):
+record = []
+for i_episode in range(500):
     s = env.reset()
     # print(s)
     ep_r=0
+    old_r = 0
 
     while True:
         env.render()
@@ -114,6 +115,7 @@ for i_episode in range(1000):
         # print(a)
 
         s_, r, done, info = env.step(a)
+        old_r+= r
 
         x, x_dot, theta, theta_dot = s_
         r1 = (env.x_threshold - abs(x)) / env.x_threshold - 0.8
@@ -129,11 +131,14 @@ for i_episode in range(1000):
         if dqn.memory_counter > MEMORY_CAPACITY:
             dqn.learn()
             if done:print('done')
-        if done:break
+        if done:
+            record.append(old_r)
+            break
         s = s_
 
 
-
+print(record)
+print(len(record))
 
 
 

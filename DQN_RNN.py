@@ -24,7 +24,7 @@ ENV_A_SHAPE = 0 if isinstance(env.action_space.sample(), int) else env.action_sp
 
 def state_transform(batch_size,Time_step,State):
     State = np.array(State)
-    State = State.reshape(batch_size, Time_step, len(State))
+    State = State.reshape(batch_size, Time_step, OBSERVE_STATES)
     State = torch.from_numpy(State)
     State = State.float()
     State = autograd.Variable(State)
@@ -66,6 +66,7 @@ class DQN(object):
 
     def choose_action(self,x):
         x = state_transform(1,1,x)
+        # print(x)
         if np.random.uniform() < EPSILON:
             actions_value = self.eval_net.forward(x)
             action = torch.max(actions_value,1)[1].data.numpy()
@@ -93,16 +94,16 @@ class DQN(object):
 
         b_memory = self.memory[sample_index, :]
 
-
-        b_s = b_memory[:,:OBSERVE_STATES]
-        print(b_s)
+        b_s = state_transform(BATCH_SIZE,1,b_memory[:,:OBSERVE_STATES])
+        # print(b_s)
 
 
         # print(len(b_s))
         # exit()
         b_a = Variable(torch.LongTensor(b_memory[:, OBSERVE_STATES:OBSERVE_STATES+1].astype(int)))
         b_r = Variable(torch.FloatTensor(b_memory[:,OBSERVE_STATES+1:OBSERVE_STATES+2]))
-        b_s_ = Variable(torch.FloatTensor(b_memory[:, -OBSERVE_STATES:]))
+        # b_s_ = Variable(torch.FloatTensor(b_memory[:, -OBSERVE_STATES:]))
+        b_s_ = state_transform(BATCH_SIZE,1,b_memory[:, -OBSERVE_STATES:])
 
         q_eval = self.eval_net(b_s).gather(1, b_a)
         q_next = self.target_net(b_s_).detach()
@@ -115,7 +116,7 @@ class DQN(object):
 
 dqn = DQN()
 record = []
-for i_episode in range(1000):
+for i_episode in range(500):
     s = env.reset()
     # print(s)
     ep_r=0
@@ -145,12 +146,13 @@ for i_episode in range(1000):
         if dqn.memory_counter > MEMORY_CAPACITY:
             dqn.learn()
             if done:
-                record.append(old_r)
+                print('done')
         if done:
             record.append(old_r)
             break
         s = s_
 print(record)
+print(len(record))
 
 
 
